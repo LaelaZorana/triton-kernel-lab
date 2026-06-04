@@ -2,7 +2,7 @@
 
 After going through Vanderbilt's AI Agents course and spending time on MLOps infrastructure work, I kept running into the same gap: I understood how to *use* GPU-accelerated libraries, but I didn't understand what was happening *inside* the kernels. What does a fused softmax actually look like? How does tiling work in matrix multiplication? Why do custom kernels sometimes outperform PyTorch's built-ins?
 
-Triton is the right access point for that. It's the Python-based GPU kernel language that OpenAI built, and it's what serious AI infrastructure teams (including those at major labs) use alongside Pallas to write custom kernels without dropping into raw CUDA C++. This repo is where I practice and benchmark those kernels — working implementations, correctness tests, and performance comparisons.
+Triton is the right access point for that, because it's the Python-based GPU kernel language that OpenAI built, and it's what serious AI infrastructure teams (including those at major labs) use alongside Pallas to write custom kernels without dropping into raw CUDA C++. This repo is where I practice and benchmark those kernels, so it holds working implementations, correctness tests, and performance comparisons.
 
 ---
 
@@ -10,20 +10,20 @@ Triton is the right access point for that. It's the Python-based GPU kernel lang
 
 ### Kernels
 
-**`kernels/softmax.py` — Fused numerically-stable softmax**  
-Block-wise kernel that computes max, subtract, exp, sum, and normalize in a single pass. The "fused" design avoids writing intermediate tensors to HBM. Detailed comments explaining each `tl.*` operation.
+**`kernels/softmax.py`: Fused numerically-stable softmax**  
+Block-wise kernel that computes max, subtract, exp, sum, and normalize in a single pass, and the "fused" design avoids writing intermediate tensors to HBM. Detailed comments explain each `tl.*` operation.
 
-**`kernels/elementwise.py` — ReLU and GELU approximation**  
-Custom elementwise activations. The bigger picture here is fusion — these building blocks combine with other ops to avoid redundant memory round-trips. The GELU approximation uses the tanh formula from GPT-2.
+**`kernels/elementwise.py`: ReLU and GELU approximation**  
+Custom elementwise activations, where the bigger picture is fusion, because these building blocks combine with other ops to avoid redundant memory round-trips. The GELU approximation uses the tanh formula from GPT-2.
 
-**`kernels/matrix_ops.py` — Tiled matrix multiplication**  
+**`kernels/matrix_ops.py`: Tiled matrix multiplication**  
 Full implementation of the classic tiling strategy: BLOCK_M × BLOCK_N output tile per program, K-loop over BLOCK_K depth slices. Comments walk through the register tiling approach and why it maps well to Tensor Core operations.
 
 ### Benchmarks
 
-**`benchmarks/benchmark_softmax.py`** — Compares naive PyTorch softmax, `torch.softmax`, and the custom Triton kernel. Reports latency (ms) and effective memory bandwidth (GB/s).
+**`benchmarks/benchmark_softmax.py`** compares naive PyTorch softmax, `torch.softmax`, and the custom Triton kernel, then reports latency (ms) and effective memory bandwidth (GB/s).
 
-**`benchmarks/benchmark_matmul.py`** — Compares `torch.matmul` (cuBLAS) vs custom Triton kernel at 512×512, 1024×1024, and 2048×2048. Reports TFLOPS achieved.
+**`benchmarks/benchmark_matmul.py`** compares `torch.matmul` (cuBLAS) vs custom Triton kernel at 512×512, 1024×1024, and 2048×2048, then reports TFLOPS achieved.
 
 ---
 
@@ -78,7 +78,7 @@ Size         Method               Latency (ms)     TFLOPS
 2048x2048    triton_matmul               1.3101     13.130
 ```
 
-The Triton softmax reaches ~97% of PyTorch's bandwidth. The matmul gap vs cuBLAS is expected — cuBLAS is hand-tuned per GPU architecture with auto-selected tile sizes and Tensor Core instruction scheduling. The Triton kernel shows the right algorithmic approach; production-level performance would require Triton's autotuner.
+The Triton softmax reaches ~97% of PyTorch's bandwidth. The matmul gap vs cuBLAS is expected, since cuBLAS is hand-tuned per GPU architecture with auto-selected tile sizes and Tensor Core instruction scheduling. The Triton kernel shows the right algorithmic approach, but production-level performance would require Triton's autotuner.
 
 ---
 
@@ -90,7 +90,7 @@ The Triton softmax reaches ~97% of PyTorch's bandwidth. The matmul gap vs cuBLAS
 
 3. **Inference optimization.** In production inference, custom fused kernels (attention, layer norm, activation + residual) are often 2–4x faster than composing library ops. Flash Attention is a famous example.
 
-4. **Understanding what cuBLAS does.** Writing a tiled matmul by hand — and benchmarking it — makes the gap between "baseline correct" and "highly optimized" concrete and measurable.
+4. **Understanding what cuBLAS does.** Writing a tiled matmul by hand, then benchmarking it, makes the gap between "baseline correct" and "highly optimized" concrete and measurable.
 
 ---
 
@@ -117,7 +117,7 @@ triton-kernel-lab/
 
 ## License
 
-MIT — Laela Zorana
+MIT, Laela Zorana
 
 ---
 
