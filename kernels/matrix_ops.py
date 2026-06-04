@@ -6,7 +6,7 @@ Why tiling matters:
 Naive matmul (A @ B = C) for an [M, K] × [K, N] multiplication requires
 reading M*K + K*N floats from global memory (HBM) and writing M*N results.
 If we compute each C[i,j] independently, we re-read entire rows/columns
-of A and B repeatedly — terrible bandwidth utilization.
+of A and B repeatedly: terrible bandwidth utilization.
 
 Tiling (also called blocking) works around this by loading a BLOCK_M × BLOCK_K
 tile of A and a BLOCK_K × BLOCK_N tile of B into fast SRAM (shared memory /
@@ -14,13 +14,13 @@ L2 cache), computing the partial dot product, then advancing to the next tile
 along the K dimension. Each tile is loaded once and reused for all output
 elements in the corresponding output tile.
 
-This reduces global memory traffic from O(MNK) to O(MK + KN + MN) — the
+This reduces global memory traffic from O(MNK) to O(MK + KN + MN), the
 same asymptotic bound but with much better constant factors due to cache reuse.
 
 Register tiling vs shared memory tiling:
   Triton's programming model exposes tile-level parallelism at the register
   level. Each program instance operates on a BLOCK_M × BLOCK_N output tile
-  and accumulates it fully before writing — which is exactly what cuBLAS does
+  and accumulates it fully before writing, which is exactly what cuBLAS does
   at its core.
 
 Requires: CUDA GPU, triton>=2.0, torch>=2.0
@@ -160,7 +160,7 @@ def triton_matmul(a: "torch.Tensor", b: "torch.Tensor") -> "torch.Tensor":
     b = b.contiguous()
     c = torch.empty((M, N), device=a.device, dtype=torch.float32)
 
-    # Tile sizes — these are autotunable; 128x128x32 is a good starting point
+    # Tile sizes: these are autotunable; 128x128x32 is a good starting point
     # for sizes that fit in L2. Triton's autotune would sweep these.
     BLOCK_M = 128
     BLOCK_N = 128

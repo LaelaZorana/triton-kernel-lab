@@ -12,7 +12,7 @@ triton = pytest.importorskip("triton")
 
 # Skip all tests if no CUDA GPU
 if not torch.cuda.is_available():
-    pytest.skip("No CUDA GPU available — skipping kernel tests", allow_module_level=True)
+    pytest.skip("No CUDA GPU available, skipping kernel tests", allow_module_level=True)
 
 from kernels.softmax import fused_softmax
 from kernels.elementwise import triton_relu, triton_gelu

@@ -4,7 +4,7 @@ Fused softmax kernel in OpenAI Triton.
 Standard softmax: softmax(x_i) = exp(x_i - max(x)) / sum(exp(x_j - max(x)))
 
 The "fused" part means the entire computation (max reduction, subtract, exp,
-sum reduction, divide) happens in a single kernel launch — no intermediate
+sum reduction, divide) happens in a single kernel launch, no intermediate
 device memory is written between steps. This saves bandwidth and reduces
 kernel launch overhead compared to composing separate CUDA kernels.
 
@@ -56,7 +56,7 @@ if _TRITON_AVAILABLE:
         # Mask out columns beyond the actual row length (padding to BLOCK_SIZE)
         mask = col_offsets < n_cols
 
-        # ── Step 3: load the row — masked load fills out-of-bounds with -inf ──
+        # ── Step 3: load the row: masked load fills out-of-bounds with -inf ──
         # Using -inf as the default ensures masked values don't affect the max.
         row = tl.load(row_start_ptr + col_offsets, mask=mask, other=-float("inf"))
 
