@@ -28,7 +28,7 @@ try:
     _HAS_TRITON = True
 except ImportError:
     _HAS_TRITON = False
-    print("triton not installed — skipping Triton kernel benchmark.")
+    print("triton not installed, skipping Triton kernel benchmark.")
 
 if not torch.cuda.is_available():
     print("No CUDA GPU detected. This benchmark requires a CUDA device.")
@@ -111,7 +111,7 @@ def run_benchmark(rows: int, cols: int):
 
 
 def main():
-    print("Softmax Benchmark — CUDA GPU")
+    print("Softmax Benchmark: CUDA GPU")
     print(f"Device: {torch.cuda.get_device_name(0)}")
     print("=" * 72)
 

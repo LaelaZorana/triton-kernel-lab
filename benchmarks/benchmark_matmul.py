@@ -24,7 +24,7 @@ try:
     _HAS_TRITON = True
 except ImportError:
     _HAS_TRITON = False
-    print("triton not installed — skipping Triton matmul benchmark.")
+    print("triton not installed, skipping Triton matmul benchmark.")
 
 if not torch.cuda.is_available():
     print("No CUDA device detected. Skipping GPU benchmark.")
@@ -56,7 +56,7 @@ def tflops(n: int, latency_ms: float) -> float:
 
 
 def main():
-    print("Matrix Multiplication Benchmark — CUDA GPU")
+    print("Matrix Multiplication Benchmark: CUDA GPU")
     print(f"Device: {torch.cuda.get_device_name(0)}")
     print("=" * 60)
 
