@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Triton kernels require a GPU. On the CPU CI runner the kernel tests
+          # skip via importorskip/skipif, so we install everything except triton
+          # and torch comes from the CPU wheel index.
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy pytest
+      - name: Run tests
+        run: python -m pytest -q
